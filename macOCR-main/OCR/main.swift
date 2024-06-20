@@ -6,8 +6,9 @@
 //
 import Foundation
 import Vision
+import AppKit
 
-let MODE = VNRequestTextRecognitionLevel.accurate // or .fast
+var MODE = VNRequestTextRecognitionLevel.accurate // or .fast
 var USE_LANG_CORRECTION = true
 let REVISION = VNRecognizeTextRequestRevision3
 
@@ -58,7 +59,7 @@ func main(args: [String]) -> Int {
                 
                 for observation in observations {
                     guard let candidate = observation.topCandidates(1).first else { continue }
-                    let string = candidate.string ?? ""
+                    let string = candidate.string
                     
                     allText += "\(string)\n"
                 }
@@ -94,4 +95,4 @@ func main(args: [String]) -> Int {
     }
 }
 
-exit(main(args: CommandLine.arguments))
+exit(Int32(main(args: CommandLine.arguments)))
