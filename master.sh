@@ -10,27 +10,27 @@ while getopts ":v:c:r:s:e:" o; do
     case "${o}" in
         v)
             video=${OPTARG}
-              ;;
+               ;;
         c)
             crop_zone=${OPTARG}
-              ;;
+               ;;
         f)
             fps=${OPTARG}
-              ;;
+               ;;
         s)
             START_TIME=${OPTARG}
-               ;;
+                ;;
         e)
             END_TIME=${OPTARG}
-                ;;
-        *)
+                 ;;
+         *)
             usage
-              ;;
+               ;;
     esac
 done
 shift $((OPTIND-1))
 
-if [ -z "${video}" ] || [ -z "${crop_zone}" ] || [ -z "${fps}" ] || [ -z ${START_TIME}" ] || [ -z "${END_TIME}" ] ; then
+if [ -z "${video}" ] || [ -z "${crop_zone}" ] || [ -z "${fps}" ] || [ -z "${START_TIME}" ] || [ -z "${END_TIME}" ]; then
     usage
 fi
 
@@ -54,6 +54,5 @@ python3 gen-srt.py "${video}_results.json" "${video}.ocr.srt"
 
 # STEP 5: normalize and deduplicate the SRT in-place
 srt-normalise -i "${video}.ocr.srt" --inplace --debug
-
 
 ffs "${video}" -i "${video}.ocr.srt" -o "${video}.srt"
