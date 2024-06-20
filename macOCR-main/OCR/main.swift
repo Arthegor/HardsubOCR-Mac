@@ -93,6 +93,7 @@ func main(args: [String]) -> Int {
         
         return 1
     }
+    return 0
 }
 
 exit(Int32(main(args: CommandLine.arguments)))
