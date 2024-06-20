@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 # USAGE:
-# ./master.sh -v video.mp4 -c 1738:115:100:965 -f 5 -s "00:02:19" -e "00:22:54"
+# ./master.sh -v video.mp4 -c "1738:115:100:965" -f 5 -s "00:02:19" -e "00:22:54"
 
 set -e
 
@@ -10,22 +10,22 @@ while getopts ":v:c:r:s:e:" o; do
     case "${o}" in
         v)
             video=${OPTARG}
-               ;;
+                ;;
         c)
             crop_zone=${OPTARG}
-               ;;
+                ;;
         f)
             fps=${OPTARG}
-               ;;
+                ;;
         s)
             START_TIME=${OPTARG}
-                ;;
+                 ;;
         e)
             END_TIME=${OPTARG}
-                 ;;
-         *)
+                  ;;
+          *)
             usage
-               ;;
+                ;;
     esac
 done
 shift $((OPTIND-1))
@@ -37,14 +37,14 @@ fi
 start_timestamp=$(date -u -d "$START_TIME" +%s)
 end_timestamp=$(date -u -d "$END_TIME" +%s)
 timediff=$(( end_timestamp - start_timestamp ))
-etime=$(date -u -d "@${timediff}" +"%H:%M:%S")
+etime=$(date -u -d @${timediff} +%H:%M:%S)
 
 # STEP 1: crop the video
 ffmpeg -i "${video}" -filter:v "crop=${crop_zone}" -c:a copy "${video}_video-cropped.mp4"
 
 # STEP 2: extract key frames to png images with detection threshold
 mkdir -p "${video}_img"
-ffmpeg -i "${video}_video-cropped.mp4" -to "$etime" -vf "fps=${fps}" -q:v 2 "${video}_img/snap_%04d.png"
+ffmpeg -i "${video}_video-cropped.mp4" -to "$etime" -vf fps="${fps}" -q:v 2 "${video}_img/snap_%04d.png"
 
 # STEP 3: run OCR on the images
 python3 do-ocr.py "${video}_img" "${video}_results.json"
@@ -55,4 +55,4 @@ python3 gen-srt.py "${video}_results.json" "${video}.ocr.srt"
 # STEP 5: normalize and deduplicate the SRT in-place
 srt-normalise -i "${video}.ocr.srt" --inplace --debug
 
-ffs "${video}" -i "${video}.ocr.srt" -o "${video}.srt"
+ffsubsync "${video}" -i "${video}.ocr.srt" -o "${video}.srt"
