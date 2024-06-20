@@ -52,7 +52,7 @@ timediff=$(( timediff % 60 ))
 etime="${etime_hours}:${etime_minutes}:${timediff}"
 
 # STEP 1: crop the video
-ffmpeg -i "${video}" -to "$etime" -vf "crop=${crop_zone}, fps=${fps}" -c:a copy "${video}_video-cropped.mp4"
+ffmpeg -ss "${START_TIME}" -i "${video}" -to "$END_TIME" -vf "crop=${crop_zone}, fps=${fps}" -c:a copy "${video}_video-cropped.mp4"
 
 # STEP 2: extract key frames to png images with detection threshold
 mkdir -p "${video}_img"
