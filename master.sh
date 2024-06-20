@@ -1,7 +1,6 @@
 #!/bin/sh
 # USAGE:
-# ./do-all.sh -v video.mp4 -c 1738:115:100:965 -f 5 -s "00:02:19" -e "00:22:54"
-# If START_TIME or END_TIME not provided, they will be calculated based on video length.
+# ./master.sh -v video.mp4 -c 1738:115:100:965 -f 5 -s "00:02:19" -e "00:22:54"
 
 set -e
 
@@ -24,32 +23,15 @@ while getopts ":v:c:r:s:e:" o; do
         e)
             END_TIME=${OPTARG}
                 ;;
-          *)
+        *)
             usage
               ;;
     esac
 done
 shift $((OPTIND-1))
 
-if [ -z "${video}" ] || [ -z "${crop_zone}" ] || [ -z "${fps}" ]; then
+if [ -z "${video}" ] || [ -z "${crop_zone}" ] || [ -z "${fps}" ] || [ -z ${START_TIME}" ] || [ -z "${END_TIME}" ] ; then
     usage
-fi
-
-getVideoDuration() {
-    local video=$1
-    ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 $video
-}
-
-if [ -z "${START_TIME}" ] || [ -z "${END_TIME}" ]; then
-    videoDuration=$(getVideoDuration $video)
-    
-    if [ -z "${START_TIME}" ]; then
-        START_TIME="00:02:19" # You can replace this with your own default value or logic to calculate start time. For example, you could subtract 30 seconds from the video duration.
-    fi
-    
-    if [ -z "${END_TIME}" ]; then
-        END_TIME="00:22:54" # You can replace this with your own default value or logic to calculate end time. For example, you could subtract 10 seconds from the video duration.
-    fi
 fi
 
 start_timestamp=$(date -u -d "$START_TIME" +%s)
