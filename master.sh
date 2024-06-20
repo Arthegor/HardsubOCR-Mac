@@ -43,3 +43,5 @@ python3 gen-srt.py "${video}_results.json" "${video}.ocr.srt"
 
 # STEP 5: normalize and deduplicate the SRT in-place
 srt-normalise -i "${video}.ocr.srt" --inplace --debug
+
+ffs "${video}" -i "${video}.ocr.srt" -o "${video}.srt"
