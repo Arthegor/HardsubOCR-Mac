@@ -31,7 +31,7 @@ def ocr_file(image):
                 ocr_dict[bucket_key] = recognized_text
                 
     except Exception as e:  # catch any exception that might occur during execution
-        print("Une erreur est apparu: ", str(e))
+        print("Une erreur est apparue: ", str(e))
         
 if __name__ == '__main__':
     lock = threading.Lock()
