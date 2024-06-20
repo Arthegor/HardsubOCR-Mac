@@ -1,8 +1,10 @@
+#!/usr/bin/env python3
+import datetime
 from difflib import SequenceMatcher
 import json
 import sys
 from pathlib import Path
-
+from datetime import timedelta
 import srt
 
 def generate_srt(json_input_file=None):

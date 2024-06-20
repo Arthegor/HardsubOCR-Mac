@@ -5,64 +5,46 @@
 # custom fork of macOCR: https://github.com/glowinthedark/macOCR
 #
 # USAGE:
-# ./do-all.sh video.mp4
+# ./do-all.sh video.mp4 --crop 1738:115:100:965 --fps 5
 
 set -e
 
-read -r -p "Generate cropped video $1_video-cropped.mp4? (Y/N).." answer
-case ${answer:0:1} in
-    y|Y )
-        ################### TODO: adjust crop area for input video ##########################
-        ffmpeg -i "$1" -filter:v "crop=1738:115:100:965" -c:a copy "$1_video-cropped.mp4"
-    ;;
-    * )
-        echo Skipping...
-    ;;
-esac
+usage() { echo "Usage: $0 [-v <video>] [-c <crop_zone>] [-r <frames per second>]" 1>&2; exit 1; }
+
+while getopts ":v:c:r:" o; do
+    case "${o}" in
+        v)
+            video=${OPTARG}
+            ;;
+        c)
+            crop_zone=${OPTARG}
+            ;;
+        r)
+            fps=${OPTARG}
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+if [ -z "${video}" ] || [ -z "${crop_zone}" ] || [ -z "${fps}" ]; then
+    usage
+fi
+
+# STEP 1: crop the video
+ffmpeg -i "${video}" -filter:v "crop=${crop_zone}" -c:a copy "${video}_video-cropped.mp4"
 
 # STEP 2: extract key frames to png images with detection threshold
+mkdir -p "${video}_img"
+ffmpeg -i "${video}_video-cropped.mp4" -start_number 1 -vf "fps=${fps}" -q:v 2 "${video}_img/snap_%04d.png"
+    
+# STEP 3: run OCR on the images
+python3 do-ocr.py "${video}_img" "${video}_results.json"
 
-# generate 1 snapshot per second
-read -r -p "Generate snapshots (y/n)?.." answer
-case ${answer:0:1} in
-    y|Y )
-        rm -rfv "$1_img"
-        mkdir -p "$1_img"
-        ffmpeg -i "$1_video-cropped.mp4" -start_number 1 -vf "fps=1" -q:v 2 "$1_img/snap_%04d.png"
-    ;;    
-    * )
-        echo Skipping...
-    ;;
-esac
+# STEP 4: generate SRT file from OCR results
+python3 gensrt.py "${video}_results.json" "${video}.ocr.srt"
 
-read -r -p "Start OCR (y/n)?.." answer
-case ${answer:0:1} in
-    y|Y )
-        rm -rfv "$1_results.json"
-        python3 do-ocr.py "$1_img" "$1_results.json"
-    ;;
-    * )
-        echo Skipping...
-    ;;
-esac
-
-read -p "Generate SRT (y/n)?.." answer
-case ${answer:0:1} in
-    y|Y )
-        rm "$1.ocr.srt"
-        python3 gensrt.py "$1_results.json" "$1.ocr.srt"
-    ;;
-    * )
-        echo Skipping...
-    ;;
-esac
-
-read -p "SRT normalize and deduplicate inplace (y/n)?.." answer
-case ${answer:0:1} in
-    y|Y )
-      srt-normalise -i "$1.ocr.srt" --inplace --debug
-    ;;
-    * )
-        echo Skipping...
-    ;;
-esac
+# STEP 5: normalize and deduplicate the SRT in-place
+srt-normalise -i "${video}.ocr.srt" --inplace --debug
