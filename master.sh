@@ -6,7 +6,7 @@ set -e
 
 usage() { echo "Usage: $0 [-v <video>] [-c <crop_zone>] [-f <frames per second>] [-s <start_time>] [-e <end time>]" 1>&2; exit 1; }
 
-while getopts ":v:c:r:s:e:" o; do
+while getopts ":v:c:f:s:e:" o; do
     case "${o}" in
         v)
             video=${OPTARG}
