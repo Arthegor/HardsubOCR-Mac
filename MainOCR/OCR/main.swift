@@ -1,14 +1,16 @@
 //
 //  main.swift
-//  OCR-Vision
+//  OCR-Vision-Framework
 //
 //  Created by MrArthegor
+//  Based on xulihang work on https://github.com/xulihang/macOCR
 //
+
 import Foundation
 import Vision
 import AppKit
 
-var MODE = VNRequestTextRecognitionLevel.accurate // or .fast
+var MODE = VNRequestTextRecognitionLevel.accurate
 var USE_LANG_CORRECTION = true
 let REVISION = VNRecognizeTextRequestRevision3
 
@@ -21,7 +23,7 @@ func main(args: [String]) -> Int {
             request.recognitionLevel = .accurate
             
             guard let langs = try? request.supportedRecognitionLanguages() else {
-                print("Failed to get supported languages")
+                print("Impossible d'obtenir la liste des languages supporté")
                 return 1
             }
             
@@ -49,7 +51,7 @@ func main(args: [String]) -> Int {
         USE_LANG_CORRECTION = languageCorrection == "true"
         
         guard let imgRef = CIImage(contentsOf: URL(fileURLWithPath: src)) else {
-            print("Failed to load image '\(src)'")
+            print("Impossible de charger l'image '\(src)'")
             return 1
         }
         
@@ -76,16 +78,19 @@ func main(args: [String]) -> Int {
         do {
             try VNImageRequestHandler(ciImage: imgRef, options: [:]).perform([request])
         } catch {
-            print("Failed to perform OCR: \(error)")
+            print("Impossible d'exécuter l'OCR: \(error)")
             return 1
         }
         
         return 0
     } else {
         print("""
-              usage:
+              Utilisation:
                 language fastmode languageCorrection image_path output_path
-                --langs: list suppported languages
+                --langs: Liste des langues supporéetes séparées par une virgule.
+                 --fast: Utiliser le mode fast (mieux pour les images avec peu de texte).
+                 --accurate: Utiliser le mode accurate (mieux pour les images avec beaucoup de texte).
+                 --langCorrection: Utiliser la correction automatique des langues.
               
               example:
                 macOCR en false true ./image.jpg out.json

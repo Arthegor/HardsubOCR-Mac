@@ -39,7 +39,7 @@ ffmpeg -i "${video}_video-cropped.mp4" -start_number 1 -vf "fps=${fps}" -q:v 2 "
 python3 do-ocr.py "${video}_img" "${video}_results.json"
 
 # STEP 4: generate SRT file from OCR results
-python3 gensrt.py "${video}_results.json" "${video}.ocr.srt"
+python3 gen-srt.py "${video}_results.json" "${video}.ocr.srt"
 
 # STEP 5: normalize and deduplicate the SRT in-place
 srt-normalise -i "${video}.ocr.srt" --inplace --debug

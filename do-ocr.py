@@ -24,14 +24,14 @@ def ocr_file(image):
         err = proc.stderr.decode()
 
         if err:
-            print("😱", err)
+            print("Erreur", err)
         else:
             with lock:
                 print(bucket_key, recognized_text)
                 ocr_dict[bucket_key] = recognized_text
                 
     except Exception as e:  # catch any exception that might occur during execution
-        print("An error occurred: ", str(e))
+        print("Une erreur est apparu: ", str(e))
         
 if __name__ == '__main__':
     lock = threading.Lock()
