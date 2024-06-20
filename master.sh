@@ -52,11 +52,11 @@ timediff=$(( timediff % 60 ))
 etime="${etime_hours}:${etime_minutes}:${timediff}"
 
 # STEP 1: crop the video
-ffmpeg -i "${video}" -filter:v "crop=${crop_zone}" -c:a copy "${video}_video-cropped.mp4"
+ffmpeg -i "${video}" -to "$etime" -vf "crop=${crop_zone}, fps=${fps}" -c:a copy "${video}_video-cropped.mp4"
 
 # STEP 2: extract key frames to png images with detection threshold
 mkdir -p "${video}_img"
-ffmpeg -i "${video}_video-cropped.mp4" -to "$etime" -vf fps="${fps}" -q:v 2 "${video}_img/snap_%04d.png"
+ffmpeg -i "${video}_video-cropped.mp4" -q:v 2 "${video}_img/snap_%04d.png"
 
 # STEP 3: run OCR on the images
 python3 do-ocr.py "${video}_img" "${video}_results.json"
