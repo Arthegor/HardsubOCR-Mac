@@ -16,7 +16,7 @@ def ocr_file(image):
                 return
         
         # run the ocr command on the file, and capture the output from stdout
-        proc = subprocess.run(["/usr/local/bin/OCR", "fr", "false", "false", image.absolute()],
+        proc = subprocess.run(["/usr/local/bin/OCR", "fr", "false", "true", image.absolute()],
                               stdout=subprocess.PIPE,
                               stderr=subprocess.PIPE)
         

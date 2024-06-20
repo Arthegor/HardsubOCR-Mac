@@ -1,9 +1,4 @@
 #!/bin/sh
-
-# REQUIREMENTS:
-# python srt module: install with `pip3 install srt`
-# custom fork of macOCR: https://github.com/glowinthedark/macOCR
-#
 # USAGE:
 # ./do-all.sh video.mp4 --crop 1738:115:100:965 --fps 5
 
