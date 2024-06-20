@@ -34,10 +34,22 @@ if [ -z "${video}" ] || [ -z "${crop_zone}" ] || [ -z "${fps}" ] || [ -z "${STAR
     usage
 fi
 
-start_timestamp=$(date -u -d "$START_TIME" +%s)
-end_timestamp=$(date -u -d "$END_TIME" +%s)
+# start_timestamp=$(date -u -d "$START_TIME" +%s)
+# end_timestamp=$(date -u -d "$END_TIME" +%s)
+# timediff=$(( end_timestamp - start_timestamp ))
+# etime=$(date -u -d @${timediff} +%H:%M:%S)
+
+# convert start and end times to seconds
+start_timestamp=$(echo ${START_TIME} | awk -F: '{ print ($1 * 3600) + ($2 * 60) + $3 }')
+end_timestamp=$(echo ${END_TIME} | awk -F: '{ print ($1 * 3600) + ($2 * 60) + $3 }')
 timediff=$(( end_timestamp - start_timestamp ))
-etime=$(date -u -d @${timediff} +%H:%M:%S)
+
+# calculate the duration in HH:MM:SS format
+etime_hours=$(( timediff / 3600 ))
+timediff=$(( timediff % 3600 ))
+etime_minutes=$(( timediff / 60 ))
+timediff=$(( timediff % 60 ))
+etime="${etime_hours}:${etime_minutes}:${timediff}"
 
 # STEP 1: crop the video
 ffmpeg -i "${video}" -filter:v "crop=${crop_zone}" -c:a copy "${video}_video-cropped.mp4"
