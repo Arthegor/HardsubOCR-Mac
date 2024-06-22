@@ -8,24 +8,12 @@ usage() { echo "Usage: $0 [-v <video>] [-c <crop_zone>] [-f <frames per second>]
 
 while getopts ":v:c:f:s:e:" o; do
     case "${o}" in
-        v)
-            video=${OPTARG}
-                ;;
-        c)
-            crop_zone=${OPTARG}
-                ;;
-        f)
-            fps=${OPTARG}
-                ;;
-        s)
-            START_TIME=${OPTARG}
-                 ;;
-        e)
-            END_TIME=${OPTARG}
-                  ;;
-          *)
-            usage
-                ;;
+        v) video=${OPTARG} ;;
+        c) crop_zone=${OPTARG} ;;
+        f) fps=${OPTARG} ;;
+        s) START_TIME=${OPTARG} ;;
+        e) END_TIME=${OPTARG} ;;
+        *) usage ;;
     esac
 done
 shift $((OPTIND-1))
@@ -33,11 +21,6 @@ shift $((OPTIND-1))
 if [ -z "${video}" ] || [ -z "${crop_zone}" ] || [ -z "${fps}" ] || [ -z "${START_TIME}" ] || [ -z "${END_TIME}" ]; then
     usage
 fi
-
-# start_timestamp=$(date -u -d "$START_TIME" +%s)
-# end_timestamp=$(date -u -d "$END_TIME" +%s)
-# timediff=$(( end_timestamp - start_timestamp ))
-# etime=$(date -u -d @${timediff} +%H:%M:%S)
 
 # convert start and end times to seconds
 start_timestamp=$(echo ${START_TIME} | awk -F: '{ print ($1 * 3600) + ($2 * 60) + $3 }')
@@ -52,7 +35,8 @@ timediff=$(( timediff % 60 ))
 etime="${etime_hours}:${etime_minutes}:${timediff}"
 
 # STEP 1: crop the video
-ffmpeg -ss "${START_TIME}" -i "${video}" -to "$END_TIME" -vf "crop=${crop_zone}, fps=${fps}" -c:a copy "${video}_video-cropped.mp4"
+#ffmpeg -ss "${START_TIME}" -i "${video}" -to "${END_TIME}" -vf "crop=${crop_zone}, fps=${fps}" -an "${video}_video-cropped.mp4"
+ffmpeg -ss "${START_TIME}" -i "${video}" -to "$END_TIME" -vf "crop=${crop_zone}, fps=${fps}" -frames:v ${num_frames} -q:v 2 "${output_prefix}/snap_%04d.png"
 
 # STEP 2: extract key frames to png images with detection threshold
 mkdir -p "${video}_img"
