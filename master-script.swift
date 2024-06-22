@@ -79,4 +79,4 @@ runCommand(commandGenSRT)
 let srtNormalizeCommand = "srt-normalise -i \(srtOutputFile) --inplace --debug"
 runCommand(srtNormalizeCommand)
 
-let finalSrtPath = (videoPath as
+let finalSrtPath = (videoPath as NSString).deletingPathExtension + ".ocr.s"
