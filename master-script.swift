@@ -67,16 +67,16 @@ runCommand(commandExtractFrames)
 
 // STEP 3: run OCR on the images
 let ocrOutputFile = (videoPath as NSString).deletingPathExtension + "_results.json"
-let commandOCR = "python3 do-ocr.py \(outputImagesDir) \(ocrOutputFile)"
+let commandOCR = "swift run doOCR \(outputImagesDir) \(ocrOutputFile)"
 runCommand(commandOCR)
 
 // STEP 4: generate SRT file from OCR results
 let srtOutputFile = (videoPath as NSString).deletingPathExtension + ".ocr.srt"
-let commandGenSRT = "python3 gen-srt.py \(ocrOutputFile) \(srtOutputFile)"
+let commandGenSRT = "swift run gensrt \(ocrOutputFile) \(srtOutputFile)"
 runCommand(commandGenSRT)
 
 // STEP 5: normalize and deduplicate the SRT in-place
-let srtNormalizeCommand = "srt-normalise -i \(srtOutputFile) --inplace --debug"
-runCommand(srtNormalizeCommand)
+// let srtNormalizeCommand = "srt-normalise -i \(srtOutputFile) --inplace --debug"
+// runCommand(srtNormalizeCommand)
 
-let finalSrtPath = (videoPath as NSString).deletingPathExtension + ".ocr.s"
+let finalSrtPath = (videoPath as NSString).deletingPathExtension + ".ocr.srt"
